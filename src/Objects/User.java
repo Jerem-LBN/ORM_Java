@@ -13,27 +13,27 @@ public class User {
         this.lastname = "";
     }
     
-    public int getId() {
+    public int getid() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setid(int id) {
         this.id = id;
     }
 
-    public String getFirstname() {
+    public String getfirstname() {
         return firstname;
     }
 
-    public void setFirstname(String firstname) {
+    public void setfirstname(String firstname) {
         this.firstname = firstname;
     }
 
-    public String getLastname() {
+    public String getlastname() {
         return this.lastname;
     }
 
-    public void setLastname(String lastname) {
+    public void setlastname(String lastname) {
         this.lastname = lastname;
     }
 
@@ -41,5 +41,16 @@ public class User {
         this.id = i;
         this.firstname = f;
         this.lastname = l;
+    }
+
+    public String toString(){
+        StringBuilder str = new StringBuilder();
+        str.append("User : ");
+        str.append(this.id);
+        str.append(" ");
+        str.append(this.firstname);
+        str.append(" ");
+        str.append(this.lastname);
+        return str.toString();
     }
 }

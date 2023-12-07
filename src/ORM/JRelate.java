@@ -2,7 +2,7 @@ package ORM;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Type;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -231,10 +231,7 @@ public class JRelate {
             req.append("SELECT * FROM ");
             req.append(tableName);
             req.append(";");
-            StringBuilder result = new StringBuilder();
             System.out.println(req.toString());
-            result.append(o.getClass().getSimpleName());
-            result.append(" : ");
             try (PreparedStatement statement = con.prepareStatement(req.toString())) {
                 try (ResultSet rs = statement.executeQuery()) {
                     while (rs.next()) {
@@ -254,11 +251,16 @@ public class JRelate {
                             }else if(type.equals("boolean")){
                                 valueField =  rs.getBoolean(fieldName);
                             }
-                            instance.getClass().getDeclaredField(fieldName).set(f, valueField);
-                            result.append(fieldName);
-                            result.append(" : ");
-                            result.append(valueField);
-                            result.append(" ");
+                            Method[] methods = instance.getClass().getDeclaredMethods();
+                            StringBuilder StringMethod = new StringBuilder();
+                            StringMethod.append("set");
+                            StringMethod.append(fieldName);
+                            for(Method m : methods){
+                                if(m.getName().equals(StringMethod.toString())){
+                                    System.out.println(m.getName().toString());
+                                    m.invoke(instance, valueField);
+                                }
+                            }
                         }
                         objets.add(instance);   
                     }
@@ -269,7 +271,7 @@ public class JRelate {
     }
 
     public List<Object> SelectObjectByID(Object o, String connexionString, String login, String mdp) throws ClassNotFoundException, SQLException, IllegalArgumentException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException, SecurityException, NoSuchFieldException{
-        List objets = new ArrayList<>();
+        List<Object> objets = new ArrayList<>();
         Connection con = getConnexion(connexionString, login, mdp);
         StringBuilder req = new StringBuilder();
         String tableName = getTableName(o);
@@ -278,12 +280,10 @@ public class JRelate {
             req.append("SELECT * FROM ");
             req.append(tableName);
             req.append(" WHERE id=?;");
-            StringBuilder result = new StringBuilder();
             System.out.println(req.toString());
-            result.append(o.getClass().getSimpleName());
-            result.append(" : ");
             try (PreparedStatement statement = con.prepareStatement(req.toString())) {
                 for(Field f : fields){
+                    f.setAccessible(true);
                     String fieldName = f.getName();
                     if(fieldName.toLowerCase() == "id"){
                         Object valueField = f.get(o);
@@ -295,10 +295,10 @@ public class JRelate {
                     while (rs.next()) {
                         Object instance = o.getClass().getConstructor().newInstance();
                         for(Field f : fields){
+                            f.setAccessible(true);
                             String fieldName = f.getName();
                             Object type = f.getType().getSimpleName();
                             Object valueField="";
-                            
                             if(type.equals("String")){
                                 valueField =  rs.getString(fieldName);
                             }else if(type.equals("int")){
@@ -308,23 +308,28 @@ public class JRelate {
                             }else if(type.equals("boolean")){
                                 valueField =  rs.getBoolean(fieldName);
                             }
-                            instance.getClass().getDeclaredField(fieldName).set(f, valueField);
-                            result.append(fieldName);
-                            result.append(" : ");
-                            result.append(valueField);
-                            result.append(" ");
+                            Method[] methods = instance.getClass().getDeclaredMethods();
+                            StringBuilder StringMethod = new StringBuilder();
+                            StringMethod.append("set");
+                            StringMethod.append(fieldName);
+                            System.out.println(StringMethod.toString());
+                            for(Method m : methods){
+                                if(m.getName().equals(StringMethod.toString())){
+                                    System.out.println(m.getName().toString());
+                                    m.invoke(instance, valueField);
+                                }
+                            }
                         }
-                        
+                    objets.add(instance);  
                     }
-                    System.out.println(result.toString());
                 }
             }  
         }
         return objets;
     }
 
-    public List<Object> SelectObjectOrdered(Object o, Field field, int ascOrDesc, String connexionString, String login, String mdp) throws Exception{
-        List objets = new ArrayList<>();
+    public List<Object> SelectObjectOrdered(Object o, String champ, int ascOrDesc, String connexionString, String login, String mdp) throws Exception{
+        List<Object> objets = new ArrayList<>();
         Connection con = getConnexion(connexionString, login, mdp);
         StringBuilder req = new StringBuilder();
         String tableName = getTableName(o);
@@ -333,7 +338,7 @@ public class JRelate {
             req.append("SELECT * FROM ");
             req.append(tableName);
             req.append(" ORDER BY ");
-            req.append(field.getName());
+            req.append(champ);
             if(ascOrDesc == 0){
                 req.append(" DESC");
             }else if(ascOrDesc == 1){
@@ -341,11 +346,7 @@ public class JRelate {
             }else{
                 throw new Exception("Saisie incorrecte");
             }
-            
-            StringBuilder result = new StringBuilder();
             System.out.println(req.toString());
-            result.append(o.getClass().getSimpleName());
-            result.append(" : ");
             try (PreparedStatement statement = con.prepareStatement(req.toString())) {
                 try (ResultSet rs = statement.executeQuery()) {
                     while (rs.next()) {
@@ -354,7 +355,6 @@ public class JRelate {
                             String fieldName = f.getName();
                             Object type = f.getType().getSimpleName();
                             Object valueField="";
-                            
                             if(type.equals("String")){
                                 valueField =  rs.getString(fieldName);
                             }else if(type.equals("int")){
@@ -364,14 +364,18 @@ public class JRelate {
                             }else if(type.equals("boolean")){
                                 valueField =  rs.getBoolean(fieldName);
                             }
-                            instance.getClass().getDeclaredField(fieldName).set(f, valueField);
-                            result.append(fieldName);
-                            result.append(" : ");
-                            result.append(valueField);
-                            result.append(" ");
+                            Method[] methods = instance.getClass().getDeclaredMethods();
+                            StringBuilder StringMethod = new StringBuilder();
+                            StringMethod.append("set");
+                            StringMethod.append(fieldName);
+                            for(Method m : methods){
+                                if(m.getName().equals(StringMethod.toString())){
+                                    m.invoke(instance, valueField);
+                                }
+                            }
                         }
+                    objets.add(instance);
                     }
-                    System.out.println(result.toString());
                 }
             }  
         }
