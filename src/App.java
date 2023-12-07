@@ -9,6 +9,7 @@ public class App {
     public static void main(String[] args) throws Exception {
         User u = new User(1, "Jeremie", "LBN");
         User u2 = new User(3, "Artur", "Poirot");
+        User u3 = new User(1, "Kevin", "Ramiray");
         JRelate jr = new JRelate();
         List<Object> users = new ArrayList<Object>();
         
@@ -18,11 +19,11 @@ public class App {
         
         //users = jr.SelectAllData(u, "jdbc:mysql://localhost:3306/testdb", "toto", "bob");
         //users = jr.SelectObjectByID(u2, "jdbc:mysql://localhost:3306/testdb", "toto", "bob");
-        users = jr.SelectObjectOrdered(u, "firstname", 0, "jdbc:mysql://localhost:3306/testdb", "toto", "bob");
+        users = jr.SelectObjectOrdered(u, "firstname", 1, "jdbc:mysql://localhost:3306/testdb", "toto", "bob");
         for(Object o : users){
             System.out.println(o.toString());
         }
-        //jr.UpdateObject(u, "jdbc:mysql://localhost:3306/testdb", "toto", "bob");
+        jr.UpdateObject(u3, "jdbc:mysql://localhost:3306/testdb", "toto", "bob");
         
     }
 }

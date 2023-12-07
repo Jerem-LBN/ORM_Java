@@ -150,12 +150,13 @@ public class JRelate {
                 if(fieldName.toLowerCase() != "id"){
                     req.append(fieldName);
                     if(i == lenFields-1){
-                        req.append("=?");
+                        req.append("=? ");
                     }else{
                         req.append("=?, ");
                     }
                 }
             }
+            req.append(reqWhere);
             System.out.println(req.toString());
             try (PreparedStatement statement = con.prepareStatement(req.toString())) {
                 for(int i = 0; i < lenFields; i++){

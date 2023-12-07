@@ -1,7 +1,5 @@
 package Objects;
 
-import java.sql.Date;
-
 public class User {
     private int id;
     private String firstname;
