@@ -1,11 +1,19 @@
 package Objects;
 
+import Decorateur.FieldName;
+import Decorateur.LengthMax;
 import Decorateur.TableName;
+import Decorateur.NotNull;
 
 @TableName(name = "Utilisateur")
 public class User {
     private int id;
+
+    @FieldName(name = "Prenom")
+    @LengthMax(length = 5)
+    @NotNull(errorMessage = "Firstname required")
     private String firstname;
+
     private String lastname;
 
     public User(){

@@ -12,6 +12,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import Decorateur.FieldName;
+import Decorateur.LengthMax;
+import Decorateur.NotNull;
 import Decorateur.TableName;
 
 public class JRelate {
@@ -22,13 +25,52 @@ public class JRelate {
         if (o.getClass().isAnnotationPresent(TableName.class)) {
             TableName Tab = o.getClass().getAnnotation(TableName.class);
             tableName = Tab.name().toString();
-            System.out.println(tableName);
         } else {
             tableName = o.getClass().getSimpleName();
-            System.out.println(tableName);
         }
         return tableName;
     }
+
+    public String getFieldName(Field f){
+        String fieldName;
+        if (f.isAnnotationPresent(FieldName.class)) {
+            FieldName Field = f.getAnnotation(FieldName.class);
+            fieldName = Field.name().toString();
+        } else {
+            fieldName = f.getName();
+        }
+        return fieldName;
+    }
+
+    public boolean verifyLength(Field f, String valueField){
+        int lengthMax;
+        if (f.isAnnotationPresent(LengthMax.class)) {
+            LengthMax Field = f.getAnnotation(LengthMax.class);
+            lengthMax = Field.length();
+            if(lengthMax >= valueField.length()){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return true;
+        }
+    }
+
+    public boolean verifyRequired(Field f, Object valueField){
+        System.out.println(valueField.toString());
+        System.out.println(!(valueField.toString() != null && !valueField.toString().isEmpty()));
+        if (f.isAnnotationPresent(NotNull.class)) {
+            if (!(valueField.toString() != null && !valueField.toString().isEmpty())) {
+                return true;
+            }else{
+                return true;
+            }
+        }else{
+            return true;
+        }
+    }
+
 
     public Field[] getFields(Object o){
         return o.getClass().getDeclaredFields();
@@ -42,41 +84,8 @@ public class JRelate {
     public Object getFieldsTypes(Field field){
         return field.getType();
     }
-
-    public String createTable(Object o, String connexionString, String login, String mdp) throws SQLException, ClassNotFoundException{
-        Connection con = getConnexion(connexionString, login, mdp);
-        StringBuilder req = new StringBuilder();
-        try(con){
-            String tableName = getTableName(o);
-            req.append("CREATE TABLE ? (");
-            int lenFields = o.getClass().getDeclaredFields().length;
-
-            for(int i = 0; i <= lenFields; i++){
-                if(i == lenFields){
-                    req.append("?);");
-                }else{
-                    req.append("?,");
-                }  
-            }
-            try (PreparedStatement statement = con.prepareStatement(req.toString())) {
-                statement.setString(1, tableName);
-                int i = 2;
-                for(Field f : o.getClass().getDeclaredFields()){
-                    statement.setString(i, f.getName());
-                    i++;
-                }
-                int rs = statement.executeUpdate(req.toString());
-                if(rs == 1){
-                    System.out.println("Enrgistrement fait");
-                }else{
-                    System.out.println("Erreur lors de l'enregistrement");
-                }
-            }
-        }
-        return req.toString();
-    }
     
-    public void InsertObject(Object o, String connexionString, String login, String mdp) throws ClassNotFoundException, SQLException, IllegalArgumentException, IllegalAccessException{
+    public void InsertObject(Object o, String connexionString, String login, String mdp) throws Exception{
         Connection con = getConnexion(connexionString, login, mdp);
         StringBuilder req = new StringBuilder();
         StringBuilder reqValues = new StringBuilder();
@@ -92,7 +101,7 @@ public class JRelate {
             for(int i = 0; i < lenFields; i++){
                 Field f = fields[i];
                 f.setAccessible(true);
-                String fieldName = f.getName();
+                String fieldName = getFieldName(f);
                 if(fieldName.toLowerCase() != "id"){
                     req.append(fieldName);
                     if(i == lenFields-1){
@@ -110,23 +119,72 @@ public class JRelate {
                 for(int i = 0; i < lenFields; i++){
                     Field f = fields[i];
                     f.setAccessible(true);
-                    String fieldName = f.getName();
+                    String fieldName = getFieldName(f);
                     if(fieldName.toLowerCase() != "id"){
                         Object type = f.getType().getSimpleName();
                         Object valueField = f.get(o);
-                        
                         if(type.equals("String")){
                             String valueString = (String) valueField;
-                            statement.setString(i, valueString);
+                            if(verifyRequired(f, valueField)){
+                                if(verifyLength(f, valueString)){
+                                    statement.setString(i, valueString);
+                                }else{
+                                    StringBuilder erreur = new StringBuilder();
+                                    erreur.append("La longueur du champ '");
+                                    erreur.append(fieldName);
+                                    erreur.append("' : '");
+                                    erreur.append(valueString);
+                                    erreur.append("' est trop grande");
+                                    throw new Exception(erreur.toString());
+                                }
+                            }else{
+                                StringBuilder erreur = new StringBuilder();
+                                erreur.append("Le champ '");
+                                erreur.append(fieldName);
+                                erreur.append("' : '");
+                                erreur.append(valueField.toString());
+                                erreur.append("' est requis");
+                                throw new Exception(erreur.toString());
+                            }
                         }else if(type.equals("int")){
                             int Int = (Integer) valueField;
-                            statement.setInt(i, Int);
+                            if(verifyRequired(f, valueField)){
+                                statement.setInt(i, Int);
+                            }else{
+                                StringBuilder erreur = new StringBuilder();
+                                erreur.append("Le champ '");
+                                erreur.append(fieldName);
+                                erreur.append("' : '");
+                                erreur.append(valueField.toString());
+                                erreur.append("' est requis");
+                                throw new Exception(erreur.toString());
+                            }
                         }else if(type.equals("Date")){
                             Date date = (Date) valueField;
-                            statement.setDate(i, date);
+                            if(verifyRequired(f, valueField)){
+                                statement.setDate(i, date);
+                            }else{
+                                StringBuilder erreur = new StringBuilder();
+                                erreur.append("Le champ '");
+                                erreur.append(fieldName);
+                                erreur.append("' : '");
+                                erreur.append(valueField.toString());
+                                erreur.append("' est requis");
+                                throw new Exception(erreur.toString());
+                            }
                         }else if(type.equals("boolean")){
                             boolean bool = (Boolean) valueField;
-                            statement.setBoolean(i, bool);
+                            if(verifyRequired(f, valueField)){
+                                statement.setBoolean(i, bool);
+                            }else{
+                                StringBuilder erreur = new StringBuilder();
+                                erreur.append("Le champ '");
+                                erreur.append(fieldName);
+                                erreur.append("' : '");
+                                erreur.append(valueField.toString());
+                                erreur.append("' est requis");
+                                throw new Exception(erreur.toString());
+                            }
                         }
                     }
                 }
@@ -141,7 +199,7 @@ public class JRelate {
         }
     }
 
-    public void UpdateObject(Object o, String connexionString, String login, String mdp) throws ClassNotFoundException, SQLException, IllegalArgumentException, IllegalAccessException{
+    public void UpdateObject(Object o, String connexionString, String login, String mdp) throws Exception{
         Connection con = getConnexion(connexionString, login, mdp);
         StringBuilder req = new StringBuilder();
         StringBuilder reqWhere = new StringBuilder();
@@ -157,7 +215,7 @@ public class JRelate {
             for(int i = 0; i < lenFields; i++){
                 Field f = fields[i];
                 f.setAccessible(true);
-                String fieldName = f.getName();
+                String fieldName = getFieldName(f);
                 if(fieldName.toLowerCase() != "id"){
                     req.append(fieldName);
                     if(i == lenFields-1){
@@ -173,13 +231,23 @@ public class JRelate {
                 for(int i = 0; i < lenFields; i++){
                     Field f = fields[i];
                     f.setAccessible(true);
-                    String fieldName = f.getName();
+                    String fieldName = getFieldName(f);
                     if(fieldName.toLowerCase() != "id"){
                         Object type = f.getType().getSimpleName();
                         Object valueField = f.get(o);
                         if(type.equals("String")){
                             String valueString = (String) valueField;
-                            statement.setString(i, valueString);
+                            if(verifyLength(f, valueString)){
+                                statement.setString(i, valueString);
+                            }else{
+                                StringBuilder erreur = new StringBuilder();
+                                erreur.append("La longueur du champ '");
+                                erreur.append(fieldName);
+                                erreur.append("' : '");
+                                erreur.append(valueString);
+                                erreur.append("' est trop grande");
+                                throw new Exception(erreur.toString());
+                            }
                         }else if(type.equals("int")){
                             int Int = (Integer) valueField;
                             statement.setInt(i, Int);
@@ -239,7 +307,6 @@ public class JRelate {
         Connection con = getConnexion(connexionString, login, mdp);
         StringBuilder req = new StringBuilder();
         String tableName = getTableName(o);
-        System.out.println(tableName);
         try(con){
             req.append("SELECT * FROM ");
             req.append(tableName);
@@ -252,7 +319,7 @@ public class JRelate {
                         Field[] fields = instance.getClass().getDeclaredFields();
                         for(Field f : fields){
                             f.setAccessible(true);
-                            String fieldName = f.getName();
+                            String fieldName = getFieldName(f);
                             Object type = f.getType().getSimpleName();
                             Object valueField="";
                             if(type.equals("String")){
@@ -297,7 +364,7 @@ public class JRelate {
             try (PreparedStatement statement = con.prepareStatement(req.toString())) {
                 for(Field f : fields){
                     f.setAccessible(true);
-                    String fieldName = f.getName();
+                    String fieldName = getFieldName(f);
                     if(fieldName.toLowerCase() == "id"){
                         Object valueField = f.get(o);
                         int Int = (Integer) valueField;
@@ -309,7 +376,7 @@ public class JRelate {
                         Object instance = o.getClass().getConstructor().newInstance();
                         for(Field f : fields){
                             f.setAccessible(true);
-                            String fieldName = f.getName();
+                            String fieldName = getFieldName(f);
                             Object type = f.getType().getSimpleName();
                             Object valueField="";
                             if(type.equals("String")){
@@ -365,7 +432,7 @@ public class JRelate {
                     while (rs.next()) {
                         Object instance = o.getClass().getConstructor().newInstance();
                         for(Field f : fields){
-                            String fieldName = f.getName();
+                            String fieldName = getFieldName(f);
                             Object type = f.getType().getSimpleName();
                             Object valueField="";
                             if(type.equals("String")){
