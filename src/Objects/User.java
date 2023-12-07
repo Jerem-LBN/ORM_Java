@@ -1,5 +1,8 @@
 package Objects;
 
+import Decorateur.TableName;
+
+@TableName(name = "Utilisateur")
 public class User {
     private int id;
     private String firstname;

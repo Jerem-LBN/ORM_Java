@@ -17,13 +17,14 @@ public class App {
         //jr.InsertObject(u2, "jdbc:mysql://localhost:3306/testdb", "toto", "bob");
         //jr.DeleteObject(u2, "jdbc:mysql://localhost:3306/testdb", "toto", "bob");
         
-        //users = jr.SelectAllData(u, "jdbc:mysql://localhost:3306/testdb", "toto", "bob");
+        users = jr.SelectAllData(u, "jdbc:mysql://localhost:3306/testdb", "toto", "bob");
         //users = jr.SelectObjectByID(u2, "jdbc:mysql://localhost:3306/testdb", "toto", "bob");
-        users = jr.SelectObjectOrdered(u, "firstname", 1, "jdbc:mysql://localhost:3306/testdb", "toto", "bob");
+        //users = jr.SelectObjectOrdered(u, "firstname", 1, "jdbc:mysql://localhost:3306/testdb", "toto", "bob");
         for(Object o : users){
             System.out.println(o.toString());
         }
-        jr.UpdateObject(u3, "jdbc:mysql://localhost:3306/testdb", "toto", "bob");
+        
+        //jr.UpdateObject(u3, "jdbc:mysql://localhost:3306/testdb", "toto", "bob");
         
     }
 }

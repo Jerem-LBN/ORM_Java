@@ -12,11 +12,22 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import Decorateur.TableName;
+
 public class JRelate {
 
 
     public String getTableName(Object o){
-        return o.getClass().getSimpleName();
+        String tableName;
+        if (o.getClass().isAnnotationPresent(TableName.class)) {
+            TableName Tab = o.getClass().getAnnotation(TableName.class);
+            tableName = Tab.name().toString();
+            System.out.println(tableName);
+        } else {
+            tableName = o.getClass().getSimpleName();
+            System.out.println(tableName);
+        }
+        return tableName;
     }
 
     public Field[] getFields(Object o){
@@ -228,6 +239,7 @@ public class JRelate {
         Connection con = getConnexion(connexionString, login, mdp);
         StringBuilder req = new StringBuilder();
         String tableName = getTableName(o);
+        System.out.println(tableName);
         try(con){
             req.append("SELECT * FROM ");
             req.append(tableName);
@@ -263,7 +275,7 @@ public class JRelate {
                                 }
                             }
                         }
-                        objets.add(instance);   
+                        objets.add(instance);
                     }
                 }
             }  
@@ -385,13 +397,11 @@ public class JRelate {
 
     public Connection getConnexion(String ConnexionString, String login, String mdp) throws ClassNotFoundException, SQLException{
         String MyDB = getDatabaseType(ConnexionString);
-
         switch(MyDB){
             case "mysql": Class.forName("com.mysql.cj.jdbc.Driver");
             case "postgresql": Class.forName("org.postgresql.Driver");
             case "sqlserver": Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
         }
-        
         Connection connexion = DriverManager.getConnection(ConnexionString, login, mdp);
         return connexion;
     }
