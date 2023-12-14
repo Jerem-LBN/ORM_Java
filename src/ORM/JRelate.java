@@ -11,7 +11,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
 import Decorateur.FieldName;
 import Decorateur.LengthMax;
 import Decorateur.NotNull;
@@ -85,8 +84,6 @@ public class JRelate {
      * @return
      */
     public boolean verifyRequired(Field field, Object valueField){
-        System.out.println(valueField.toString());
-        System.out.println(!(valueField.toString() != null && !valueField.toString().isEmpty()));
         if (field.isAnnotationPresent(NotNull.class)) {
             if (!(valueField.toString() != null && !valueField.toString().isEmpty())) {
                 return true;
@@ -236,7 +233,6 @@ public class JRelate {
                     }
                 }
                 //Exécution de la requête
-                System.out.println(statement.toString());
                 int rs = statement.executeUpdate();
                 if(rs == 1){
                     System.out.println("Enregistrement effectué !");
@@ -425,7 +421,6 @@ public class JRelate {
                             //Ici, j'utilise la méthode set de la classe de l'objet
                             for(Method m : methods){
                                 if(m.getName().equals(StringMethod.toString())){
-                                    System.out.println(m.getName().toString());
                                     m.invoke(instance, valueField);
                                 }
                             }
