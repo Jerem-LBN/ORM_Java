@@ -2,14 +2,15 @@ package Objects;
 
 import Decorateur.FieldName;
 import Decorateur.LengthMax;
-import Decorateur.TableName;
 import Decorateur.NotNull;
+import Decorateur.TableName;
 
-@TableName(name = "Utilisateur")
+
+//@TableName(name = "Utilisateur")
 public class User {
     private int id;
 
-    @FieldName(name = "Prenom")
+    //@FieldName(name = "Prenom")
     @LengthMax(length = 5)
     @NotNull(errorMessage = "Firstname required")
     private String firstname;
@@ -21,7 +22,7 @@ public class User {
         this.firstname = "";
         this.lastname = "";
     }
-    
+
     public int getid() {
         return id;
     }
@@ -54,12 +55,7 @@ public class User {
 
     public String toString(){
         StringBuilder str = new StringBuilder();
-        str.append("User : ");
-        str.append(this.id);
-        str.append(" ");
-        str.append(this.firstname);
-        str.append(" ");
-        str.append(this.lastname);
+        str.append("User : ").append(this.id).append(" ").append(this.firstname).append(" ").append(this.lastname);
         return str.toString();
     }
 }

@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
 import Decorateur.FieldName;
 import Decorateur.LengthMax;
 import Decorateur.NotNull;
@@ -19,11 +20,9 @@ import Decorateur.TableName;
 public class JRelate {
 
     /**
-     * Cette méthode renvoie le nom de la classe de l'objet fournis en paramètre.
-     * Ou le nom spécifié par le décorateur 'TableName' si il est présent.
-     * 
-     * @param object
-     * @return
+     * Methode qui renvoie le nom de la table grace a la classe de l'objet en parametre
+     * @param object correspond a l'objet qui doit etre de la meme classe de la table dans la BDD.
+     * @return le nom de l'objet fournis en parametre ou le nom specifie par le decorateur TableName si il est present.
      */
     public String getTableName(Object object){
         String tableName;
@@ -36,12 +35,10 @@ public class JRelate {
         return tableName;
     }
 
-    /**
-     * Cette méthode renvoie le nom du champ fournis en paramètre.
-     * Ou le nom spécifié par le décorateur 'FieldName' si il est présent.
-     * 
+    /** 
+     * Methode qui renvoie le nom du champ en parametre
      * @param field
-     * @return
+     * @return le nom du champ
      */
     public String getFieldName(Field field){
         String fieldName;
@@ -55,11 +52,10 @@ public class JRelate {
     }
 
     /**
-     * Cette méthode regarde si le décorateur LengthMax est présent. Et si la longueur de valueField n'est pas trop grande.
-     * 
-     * @param field
+     * Methode qui renvoie si la valeur du champ est trop grande par rapport au decorateur
+     * @param field 
      * @param valueField
-     * @return
+     * @return si la valeur est trop grande si le decorateur LengthMax est present.
      */
     public boolean verifyLength(Field field, String valueField){
         int lengthMax;
@@ -77,11 +73,10 @@ public class JRelate {
     }
 
     /**
-     * Cette méthode regarde si le décorateur NotNull est présent. Et si la valeur de valueField n'est pas null.
-     * 
+     * Methode qui renvoie si la valeur doit etre not null si le decorateur est present
      * @param field
      * @param valueField
-     * @return
+     * @return si la valeur de valueField n'est pas null, dans le cas ou le decorateur NotNull est present
      */
     public boolean verifyRequired(Field field, Object valueField){
         if (field.isAnnotationPresent(NotNull.class)) {
@@ -96,20 +91,18 @@ public class JRelate {
     }
 
     /**
-     * Cette méthode renvoie la liste des champs présents dans l'objet.
-     * 
+     * Methode qui renvoie les champs de l'objet en parametre
      * @param object
-     * @return
+     * @return la liste des champs presents dans l'objet.
      */
     public Field[] getFields(Object object){
         return object.getClass().getDeclaredFields();
     }
 
     /**
-     * Cette méthode renvoie le type de base de données.
-     * 
-     * @param ConnexionString
-     * @return
+     * Methode qui renvoie le type de la BDD
+     * @param ConnexionString correspond a la chaine de connexion.
+     * @return le type de base de donnees.
      */
     public String getDatabaseType(String ConnexionString){
         String[] a = ConnexionString.split(":");
@@ -117,12 +110,11 @@ public class JRelate {
     }
 
     /**
-     * Cette méthode renvoie une connexion à la BDD en chargant le bon driver.
-     * 
-     * @param ConnexionString
+     * Methode qui renvoie la connexion a la BDD
+     * @param ConnexionString correspond a la chaine de connexion.
      * @param login
      * @param password
-     * @return
+     * @return une connexion a la BDD en chargant le bon driver.
      * @throws ClassNotFoundException
      * @throws SQLException
      */
@@ -138,10 +130,9 @@ public class JRelate {
     }
 
     /**
-     * Cette méthode insert un objet dans la BDD.
-     * 
-     * @param object
-     * @param connexionString
+     * Methode qui insert un objet dans la BDD
+     * @param object objet qui sera insere en base.
+     * @param connexionString correspond a la chaine de connexion.
      * @param login
      * @param password
      * @throws Exception
@@ -244,11 +235,9 @@ public class JRelate {
     }
 
     /**
-     * Cette méthode modifie une ligne dans la BDD.
-     * L'id de l'objet correspond à l'id qui est en base.
-     * 
-     * @param object
-     * @param connexionString
+     * Methode qui met a jour une ligne dans la BDD.
+     * @param object object qui sera modifie a l'id en bdd. En utilisant les valeurs de cette objet.
+     * @param connexionString correspond a la chaine de connexion.
      * @param login
      * @param password
      * @throws Exception
@@ -327,10 +316,9 @@ public class JRelate {
     }
 
     /**
-     * Cette méthode supprime une ligne de la BDD.
-     * 
-     * @param object
-     * @param connexionString
+     * Methode qui supprime une ligne de la BDD, en utilisant l'id de l'objet qui est mis en parametre
+     * @param object objet qui sera supprime dans la bdd.
+     * @param connexionString correspond a la chaine de connexion.
      * @param login
      * @param password
      * @throws ClassNotFoundException
@@ -367,13 +355,12 @@ public class JRelate {
     }
 
     /**
-     * Cette méthode renvoie une liste d'objets, qui auront le même type que l'objet passé en paramètre.
-     * 
-     * @param object
-     * @param connexionString
+     * Methode qui renvoie une liste d'objets qui seront du meme type que celui fournis en parametre
+     * @param object objet qui correspond a la table dans la BDD.
+     * @param connexionString correspond a la chaine de connexion.
      * @param login
      * @param password
-     * @return
+     * @return une liste d'objets, qui auront le meme type que l'objet passe en parametre.
      * @throws ClassNotFoundException
      * @throws SQLException
      * @throws IllegalArgumentException
@@ -435,14 +422,12 @@ public class JRelate {
 
 
     /**
-     * Cette méthode retourne un objet qui est sélectionné grâce à son id.
-     * Prend l'id de l'objet fournis en paramètre
-     * 
-     * @param object
-     * @param connexionString
-     * @param login
+     * Methode qui renvoie un objet a partir de l'id de l'objet fournis en parametre
+     * @param object On prend l'id de cet objet.
+     * @param connexionString correspond a la chaine de connexion.
+     * @param login 
      * @param password
-     * @return
+     * @return un objet qui est selectionne grace a son id.
      * @throws ClassNotFoundException
      * @throws SQLException
      * @throws IllegalArgumentException
@@ -453,8 +438,8 @@ public class JRelate {
      * @throws SecurityException
      * @throws NoSuchFieldException
      */
-    public List<Object> SelectObjectByID(Object object, String connexionString, String login, String password) throws ClassNotFoundException, SQLException, IllegalArgumentException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException, SecurityException, NoSuchFieldException{
-        List<Object> objets = new ArrayList<>();
+    public Object SelectObjectByID(Object object, String connexionString, String login, String password) throws ClassNotFoundException, SQLException, IllegalArgumentException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException, SecurityException, NoSuchFieldException{
+    	Object instance = null;
          //Création de la connexion
         Connection con = getConnexion(connexionString, login, password);
         StringBuilder req = new StringBuilder();
@@ -477,7 +462,7 @@ public class JRelate {
                     //Récupération de la ligne
                     while (rs.next()) {
                         //Création d'une instance de l'objet
-                        Object instance = object.getClass().getConstructor().newInstance();
+                        instance = object.getClass().getConstructor().newInstance();
                         for(Field f : fields){
                             f.setAccessible(true);
                             String fieldName = getFieldName(f);
@@ -503,26 +488,23 @@ public class JRelate {
                                 }
                             }
                         }
-                    objets.add(instance);  
                     }
                 }
             }  
         }
-        return objets;
+        return instance;
     }
 
 
     /**
-     * Cette fonction renvoie une liste d'objets ordonés de façon croissante ou décroissante, 
-     * en fonction d'un attribut fournit en paramètre. (0 : DESC; 1 : ASC)
-     * 
+     * Methode qui renvoie une liste d'objets
      * @param object
-     * @param field
-     * @param ascOrDesc
-     * @param connexionString
+     * @param field champ sur lequel sera fait la clause where
+     * @param ascOrDesc 0:DESC; 1:ASC
+     * @param connexionString correspond a la chaine de connexion.
      * @param login
      * @param password
-     * @return
+     * @return 
      * @throws Exception
      */
     public List<Object> SelectObjectOrdered(Object object, String field, int ascOrDesc, String connexionString, String login, String password) throws Exception{
