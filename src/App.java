@@ -9,13 +9,12 @@ public class App {
         User u = new User(1, "Jeremie", "LBN");
         //User u2 = new User(3, "Artur", "Poirot");
         //User u3 = new User(1, "Steven", "Ramiray");
-        User u4 = new User();
+        /*User u4 = new User();
         u4.setid(4);
-        u4.setlastname("OK");
+        u4.setlastname("OK");*/
         JRelate jr = new JRelate();
         List<Object> users = new ArrayList<Object>();
         
-        //jr.createTable(u, "jdbc:mysql://localhost:3306/testdb", "toto", "bob");
         //jr.InsertObject(u4, "jdbc:mysql://localhost:3306/testdb", "toto", "bob");
         //jr.DeleteObject(u2, "jdbc:mysql://localhost:3306/testdb", "toto", "bob");
         Object u5 = jr.SelectObjectByID(u, "jdbc:mysql://localhost:3306/testdb", "toto", "bob");
